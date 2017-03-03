@@ -1,2 +1,7 @@
 /pocket
 /.auth_cache.json
+tags
+pycscope.files
+pycscope.out
+cscope.files
+.csearchindex

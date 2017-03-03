@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/motemen/go-pocket/api"
+	"github.com/junkblocker/go-pocket/api"
 )
 
 type RequestToken struct {

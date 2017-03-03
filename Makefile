@@ -1,3 +1,6 @@
+install: cmd
+	go install ./cmd/pocket
+
 cmd: deps
 	go build ./cmd/pocket
 
@@ -10,4 +13,4 @@ test: testdeps
 testdeps:
 	go get -t ./...
 
-.PHONY: cmd deps test tesdeps
+.PHONY: cmd deps test tesdeps install

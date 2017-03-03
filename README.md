@@ -5,7 +5,7 @@ Pocket (getpocket.com) API client for Go (golang).
 
 #### Install
 
-`go get github.com/motemen/go-pocket/...`
+`go get github.com/junkblocker/go-pocket/...`
 
 #### Use
 ```
