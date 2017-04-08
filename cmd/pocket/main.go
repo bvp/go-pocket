@@ -74,7 +74,7 @@ Usage:
   pocket list [--format=<template>] [--domain=<domain>] [--tag=<tag>] [--search=<query>]
   pocket archive <item-id>
   pocket add <url> [--title=<title>] [--tags=<tags>]
-  pocket spotlight
+  pocket spotlight [--indexdir=<dir>]
 
 Options for list:
   -f, --format <template> A Go template to show items.
@@ -86,6 +86,10 @@ Options for add:
   --title <title>         A manually specified title for the article
   --tags <tags>           A comma-separated list of tags
 
+Options for spotlight:
+  --indexdir <dir>        Where the spotlight metadata should be saved.
+                          NOTE: Must not contain any hidden ('.' prefixed) directories.
+                          CAUTION: Everything under it will be deleted.
 Fields for format template:
    %s
 
@@ -232,19 +236,24 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 		items = append(items, item)
 	}
 
-	// TODO: This must not be a hidden path or spotlight won't index it
-	home := os.Getenv("HOME")
-	if home == "" {
-		fmt.Fprintln(os.Stderr, "$HOME not set")
-		os.Exit(1)
+	var indexDir string
+	if dir, ok := arguments["--indexdir"].(string); ok {
+		indexDir = dir
+	} else {
+		// NOTE: This must not be a hidden path or spotlight won't index it
+		home := os.Getenv("HOME")
+		if home == "" {
+			fmt.Fprintln(os.Stderr, "$HOME not set")
+			os.Exit(1)
+		}
+		indexDir = filepath.Join(home, "Library/Caches/Metadata/go-pocket")
 	}
-	metadatadir := filepath.Join(home, "Library/Caches/Metadata/go-pocket")
-	err = os.RemoveAll(metadatadir)
+	err = os.RemoveAll(indexDir)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	err = os.MkdirAll(metadatadir, 0700)
+	err = os.MkdirAll(indexDir, 0700)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -257,7 +266,7 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 			fmt.Fprintf(os.Stderr, "Error calculating hash: %v\n", err)
 			os.Exit(1)
 		}
-		fpath := filepath.Join(metadatadir, fmt.Sprintf("%x.webbookmark", h.Sum(nil)))
+		fpath := filepath.Join(indexDir, fmt.Sprintf("%x.webbookmark", h.Sum(nil)))
 
 		fout, err := os.Create(fpath)
 		if err != nil {
@@ -277,7 +286,7 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 			os.Exit(1)
 		}
 	}
-	_, err = exec.Command("/usr/bin/mdimport", metadatadir).CombinedOutput()
+	_, err = exec.Command("/usr/bin/mdimport", indexDir).CombinedOutput()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
