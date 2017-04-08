@@ -264,12 +264,13 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		defer fout.Close()
 		err = itemTemplate.Execute(fout, item)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			fout.Close()
 			os.Exit(1)
 		}
+		fout.Close()
 		_, err = exec.Command("/usr/bin/plutil", "-convert", "binary1", fpath).CombinedOutput()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
