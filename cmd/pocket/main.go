@@ -221,7 +221,9 @@ func commandAdd(arguments map[string]interface{}, client *api.Client) {
 }
 
 func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
-	options := &api.RetrieveOption{}
+	options := &api.RetrieveOption{
+		State: api.StateAll,
+	}
 
 	res, err := client.Retrieve(options)
 	if err != nil {
@@ -230,11 +232,6 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 	}
 
 	itemTemplate := spotlightItemTemplate
-
-	items := []api.Item{}
-	for _, item := range res.List {
-		items = append(items, item)
-	}
 
 	var indexDir string
 	if dir, ok := arguments["--indexdir"].(string); ok {
@@ -259,7 +256,7 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 		os.Exit(1)
 	}
 
-	for _, item := range items {
+	for _, item := range res.List {
 		h := sha256.New()
 		_, err := h.Write([]byte(item.URL()))
 		if err != nil {
