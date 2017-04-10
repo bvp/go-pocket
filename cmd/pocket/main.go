@@ -258,7 +258,7 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 
 	for _, item := range res.List {
 		h := sha256.New()
-		_, err := h.Write([]byte(item.URL()))
+		_, err = h.Write([]byte(item.URL()))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error calculating hash: %v\n", err)
 			os.Exit(1)
