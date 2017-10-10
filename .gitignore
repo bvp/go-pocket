@@ -5,3 +5,4 @@ pycscope.files
 pycscope.out
 cscope.files
 .csearchindex
+.idea
