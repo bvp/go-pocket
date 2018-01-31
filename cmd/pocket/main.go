@@ -290,9 +290,9 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 		fname = repeatSpace.ReplaceAllString(fname, " ")
 		fname = leadingNoise.ReplaceAllString(fname, "")
 		fname = trailingNoise.ReplaceAllString(fname, "")
-		fname_runes := []rune(fname)
-		if len(fname_runes) > maxTitle {
-			fname = string([]rune(fname)[0:maxTitle])
+		fnameRunes := []rune(fname)
+		if len(fnameRunes) > maxTitle {
+			fname = string(fnameRunes[0:maxTitle])
 		}
 		fpath := filepath.Join(indexDir, fmt.Sprintf("%s.webloc", fname))
 
@@ -307,15 +307,21 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 			fout.Close()
 			os.Exit(1)
 		}
-		fout.Close()
-		_, err = exec.Command("/usr/bin/plutil", "-convert", "binary1", fpath).CombinedOutput()
+		err = fout.Close()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+		plutilOut, err := exec.Command("/usr/bin/plutil", "-convert", "binary1", fpath).CombinedOutput()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, plutilOut)
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
-	_, err = exec.Command("/usr/bin/mdimport", indexDir).CombinedOutput()
+	mdimportOut, err := exec.Command("/usr/bin/mdimport", indexDir).CombinedOutput()
 	if err != nil {
+		fmt.Fprintln(os.Stderr, mdimportOut)
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
