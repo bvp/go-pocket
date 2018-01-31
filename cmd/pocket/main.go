@@ -14,6 +14,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -27,6 +28,9 @@ import (
 
 var version = "0.1"
 
+const maxFilename = 127
+const maxTitle = maxFilename - len(`.webloc`)
+
 var defaultItemTemplate = template.Must(template.New("item").Parse(
 	`[{{.ItemID | printf "%9d"}}] {{.Title}} <{{.URL}}>`,
 ))
@@ -35,8 +39,6 @@ var spotlightItemTemplate = template.Must(template.New("item").Parse(`<?xml vers
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Name</key>
-    <string>{{- .Title | html -}}</string>
     <key>URL</key>
     <string>{{- .URL | html -}}</string>
 </dict>
@@ -221,6 +223,26 @@ func commandAdd(arguments map[string]interface{}, client *api.Client) {
 }
 
 func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
+	badChars, err := regexp.Compile(`[^a-zA-Z0-9'". _-|()[]`)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	repeatSpace, err := regexp.Compile(`\s+`)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	leadingNoise, err := regexp.Compile(`^[ \t_-]+`)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	trailingNoise, err := regexp.Compile(`[ \t_-]+$`)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	options := &api.RetrieveOption{
 		State: api.StateAll,
 	}
@@ -263,7 +285,16 @@ func commandSpotlight(arguments map[string]interface{}, client *api.Client) {
 			fmt.Fprintf(os.Stderr, "Error calculating hash: %v\n", err)
 			os.Exit(1)
 		}
-		fpath := filepath.Join(indexDir, fmt.Sprintf("%x.webbookmark", h.Sum(nil)))
+		fname := item.Title()
+		fname = badChars.ReplaceAllString(fname, "")
+		fname = repeatSpace.ReplaceAllString(fname, " ")
+		fname = leadingNoise.ReplaceAllString(fname, "")
+		fname = trailingNoise.ReplaceAllString(fname, "")
+		fname_runes := []rune(fname)
+		if len(fname_runes) > maxTitle {
+			fname = string([]rune(fname)[0:maxTitle])
+		}
+		fpath := filepath.Join(indexDir, fmt.Sprintf("%s.webloc", fname))
 
 		fout, err := os.Create(fpath)
 		if err != nil {
