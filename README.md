@@ -5,7 +5,7 @@ Pocket (getpocket.com) API client for Go (golang).
 
 #### Install
 
-`go get github.com/junkblocker/go-pocket/...`
+`go get -u github.com/junkblocker/go-pocket/cmd/pocket`
 
 #### Use
 ```
@@ -15,4 +15,3 @@ pocket list
 # Visit the URL listed in order to authenticate with Pocket
 # After succesful authentication, your Pocket article list will appear
 ```
-
