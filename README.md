@@ -3,9 +3,9 @@ Pocket (getpocket.com) API client for Go (golang).
 
 ## Usage
 
-#### Install
+#### Install with go 1.13 or newer
 
-`go get -u github.com/junkblocker/go-pocket/cmd/pocket`
+`go install github.com/junkblocker/go-pocket/cmd/pocket`
 
 #### Use
 ```
