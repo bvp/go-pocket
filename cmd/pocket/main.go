@@ -23,8 +23,8 @@ import (
 	"text/template"
 
 	"github.com/docopt/docopt-go"
-	"github.com/junkblocker/go-pocket/api"
-	"github.com/junkblocker/go-pocket/auth"
+	"github.com/bvp/go-pocket/api"
+	"github.com/bvp/go-pocket/auth"
 )
 
 var version = "0.1"

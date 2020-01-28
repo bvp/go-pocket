@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/junkblocker/go-pocket/api"
-	"github.com/junkblocker/go-pocket/auth"
+	"github.com/bvp/go-pocket/api"
+	"github.com/bvp/go-pocket/auth"
 	. "github.com/onsi/gomega"
 )
 
