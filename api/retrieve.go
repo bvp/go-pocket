@@ -90,8 +90,8 @@ const (
 )
 
 type Item struct {
-	ItemID        int        `json:"item_id,string"`
-	ResolvedId    int        `json:"resolved_id,string"`
+	ItemID        int64      `json:"item_id,string"`
+	ResolvedId    int64      `json:"resolved_id,string"`
 	GivenURL      string     `json:"given_url"`
 	ResolvedURL   string     `json:"resolved_url"`
 	GivenTitle    string     `json:"given_title"`
